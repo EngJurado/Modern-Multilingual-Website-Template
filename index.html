@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Site</title>
+    <style>
+        /* ============================================
+           1. CSS VARIABLES (THEMES)
+           ============================================ */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #65676b;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #e4e6eb;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --icon-color: #1a1a1a;
+            --card-border: 1px solid var(--border-color);
+        }
+
+        body.dark-mode {
+            --bg-body: #18191a;
+            --bg-card: #242526;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --accent-color: #4facfe;
+            --accent-hover: #00f2fe;
+            --border-color: #3e4042;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --icon-color: #e4e6eb;
+            --card-border: 1px solid var(--border-color);
+        }
+
+        /* ============================================
+           2. GLOBAL STYLES
+           ============================================ */
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           3. MAIN CARD
+           ============================================ */
+        .card {
+            background-color: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            border: var(--card-border);
+
+            & h1 {
+                margin-top: 0;
+                font-size: 2rem;
+                letter-spacing: -0.5px;
+            }
+
+            & p {
+                color: var(--text-secondary);
+                line-height: 1.6;
+                margin-bottom: 30px;
+            }
+        }
+
+        /* ============================================
+           4. LANGUAGE BUTTONS
+           ============================================ */
+        .lang-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+
+            & .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 0.95rem;
+                transition: transform 0.2s, opacity 0.2s, background-color 0.3s;
+
+                &:active {
+                    transform: scale(0.95);
+                }
+            }
+
+            & .btn-es {
+                background-color: #ffcc00;
+                color: #333;
+                &:hover { background-color: #e6b800; }
+            }
+
+            & .btn-en {
+                background-color: var(--accent-color);
+                color: white;
+                &:hover { background-color: var(--accent-hover); }
+            }
+        }
+
+        /* ============================================
+           5. STATUS BADGE
+           ============================================ */
+        .status-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 4px 12px;
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+
+            & span {
+                color: var(--accent-color);
+            }
+        }
+
+        /* ============================================
+           6. THEME TOGGLE BUTTON
+           ============================================ */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--icon-color);
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+
+            &:hover {
+                background-color: var(--border-color);
+                transform: rotate(15deg);
+            }
+        }
+
+        /* ============================================
+           7. RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 600px) {
+            .card {
+                padding: 30px 20px;
+                & h1 { font-size: 1.5rem; }
+                & .lang-buttons {
+                    flex-direction: column;
+                    gap: 10px;
+                    & .btn { width: 100%; }
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+            🌙
+        </button>
+
+        <!-- Content: Note the data-i18n keys match the JS object exactly -->
+        <h1 data-i18n="title">Welcome</h1>
+        <p data-i18n="description">This page has a modern design, detects your language, and adapts to your dark/light theme automatically.</p>
+        
+        <div class="status-badge">
+            <span data-i18n="lang_label">Language:</span> <span id="current-lang">--</span>
+        </div>
+
+        <div class="lang-buttons">
+            <button class="btn btn-es" onclick="setLanguage('es')">🇪🇸 Español</button>
+            <button class="btn btn-en" onclick="setLanguage('en')">🇺🇸 English</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 1. TRANSLATIONS OBJECT
+        // ============================================
+        const translations = {
+            es: { 
+                title: "¡Hola! Diseño Moderno", 
+                description: "Esta página detecta tu idioma y tu tema (claro/oscuro) automáticamente.",
+                lang_label: "Idioma detectado:"
+            },
+            en: { 
+                title: "Hello! Modern Design", 
+                description: "This page detects your language and theme (light/dark) automatically.",
+                lang_label: "Detected language:"
+            }
+        };
+
+        // ============================================
+        // 2. LANGUAGE FUNCTION (DYNAMIC LOOP)
+        // ============================================
+        function setLanguage(lang) {
+            console.log("🔄 Changing language to:", lang);
+
+            // Select ALL elements that have the data-i18n attribute
+            const elements = document.querySelectorAll('[data-i18n]');
+            
+            // Loop through each element and update text
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                } else {
+                    console.warn(`⚠️ Missing translation for key: "${key}" in language "${lang}"`);
+                }
+            });
+
+            // Update the language code display
+            document.getElementById('current-lang').textContent = lang.toUpperCase();
+            
+            // Save preference
+            localStorage.setItem('userLang', lang);
+            console.log("✅ Language updated successfully");
+        }
+
+        // ============================================
+        // 3. THEME CONFIGURATION
+        // ============================================
+        const themeBtn = document.getElementById('theme-btn');
+        const body = document.body;
+
+        function toggleTheme() {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            themeBtn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('userTheme', isDark ? 'dark' : 'light');
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('userTheme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                body.classList.add('dark-mode');
+                themeBtn.textContent = '☀️';
+            } else {
+                body.classList.remove('dark-mode');
+                themeBtn.textContent = '🌙';
+            }
+        }
+
+        // ============================================
+        // 4. INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+
+            const savedLang = localStorage.getItem('userLang');
+            if (savedLang) {
+                setLanguage(savedLang);
+            } else {
+                const userLang = navigator.language || navigator.userLanguage;
+                setLanguage(userLang.startsWith('es') ? 'es' : 'en');
+            }
+        });
+    </script>
+</body>
+</html>
